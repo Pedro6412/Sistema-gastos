@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Gastos Mensais</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="mb-5">
+            <h1>Calculadora de Gastos Mensais</h1>
+            <p class="text-center text-muted">Acompanhe e gerencie suas despesas mensais</p>
+        </header>
+        
+        <!-- Formulário de Adição de Despesa -->
+        <div class="card mb-5 fade-in">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-plus-circle me-2"></i>
+                <h5 class="mb-0">Adicionar Nova Despesa</h5>
+            </div>
+            <div class="card-body">
+                <form id="expenseForm">
+                    <input type="hidden" id="expenseId">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="description" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="description" required>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="amount" class="form-label">Valor (R$)</label>
+                            <input type="number" class="form-control" id="amount" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="category" class="form-label">Categoria</label>
+                            <select class="form-select" id="category" required>
+                                <option value="">Selecione...</option>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Moradia">Moradia</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Saúde">Saúde</option>
+                                <option value="Lazer">Lazer</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="date" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="date" required>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end mb-3">
+                            <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                                <span class="d-none d-md-inline">Salvar</span>
+                                <i class="bi bi-check-lg ms-md-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumo por Categoria -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card fade-in" style="animation-delay: 0.1s;">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="bi bi-pie-chart me-2"></i>
+                        <h5 class="mb-0">Resumo por Categoria</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="summaryChart" class="chart-container">
+                            <!-- O gráfico será renderizado aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Despesas -->
+        <div class="card fade-in" style="animation-delay: 0.2s;">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center">
+                <h5 class="mb-3 mb-md-0 d-flex align-items-center">
+                    <i class="bi bi-card-list me-2"></i>
+                    <span>Despesas Recentes</span>
+                </h5>
+                <div class="input-group" style="max-width: 100%; width: 100%;">
+                    <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar por descrição, valor ou categoria...">
+                    <button class="btn btn-outline-secondary d-flex align-items-center" type="button" id="searchButton">
+                        <span class="d-none d-md-inline">Buscar</span>
+                        <i class="bi bi-arrow-right-short d-md-none"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-nowrap">Descrição</th>
+                                <th class="text-nowrap text-end">Valor (R$)</th>
+                                <th class="text-nowrap">Categoria</th>
+                                <th class="text-nowrap">Data</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody">
+                            <!-- As despesas serão carregadas aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza que deseja excluir esta despesa?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted mt-5 mb-4">
+        <p class="small">© 2023 Calculadora de Gastos Mensais</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        // Adiciona a data atual como valor padrão para o campo de data
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+        });
+    </script>
+</body>
+</html>
